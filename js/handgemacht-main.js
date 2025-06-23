@@ -2492,13 +2492,28 @@ const app = {
 				let type = '';
 				fgNode ? type = fgNode.type : type = 'none';
 
+				//UUID hack, crypto.randomUUID() is broken on Edge in Filemaker
+				//source: https://gist.github.com/jsmithdev/1f31f9f3912d40f6b60bdc7e8098ee9f
+				function createUUID(){
+				   
+				    let dt = new Date().getTime()
+				    
+				    const uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+				        const r = (dt + Math.random()*16)%16 | 0
+				        dt = Math.floor(dt/16)
+				        return (c=='x' ? r :(r&0x3|0x8)).toString(16)
+				    })
+				    
+				    return uuid
+				}
+
 				this.pillArray = [];
 				
 				if(type === 'node-object'){
 					let categoryList = '';
 					for(let category of fgNode.categories) {
 						if(category === ''){ continue; }
-						let pillId = 'category-' + self.crypto.randomUUID();
+						let pillId = 'category-' + createUUID(); //self.crypto.randomUUID() before hack implementation
 						categoryList += '<div id="' + pillId +'" '
 										+ 'class="pill shadow-' + app.collectionViewer.elementColor.category + ' text-coalgrey" '
 										+ 'data-model-id="' + fgNode.id +'" '
@@ -2516,7 +2531,7 @@ const app = {
 					let topicList = '';
 					for(let topic of fgNode.topics) {
 						if(topic === ''){ continue; }
-						let pillId = 'topic-' + self.crypto.randomUUID();
+						let pillId = 'topic-' + createUUID(); //self.crypto.randomUUID() before hack implementation
 						topicList += '<div id="' + pillId +'" '
 										+ 'class="pill shadow-' + app.collectionViewer.elementColor.topic + ' text-coalgrey" '
 										+ 'data-model-id="' + fgNode.id +'" '
@@ -2534,7 +2549,7 @@ const app = {
 					let tagList = '';
 					for(let tag of fgNode.tags) {
 						if(tag === ''){ continue; }
-						let pillId = 'tag-' + self.crypto.randomUUID();
+						let pillId = 'tag-' + createUUID(); //self.crypto.randomUUID() before hack implementation
 						tagList += '<div id="' + pillId +'" '
 										+ 'class="pill shadow-' + app.collectionViewer.elementColor.tag + ' text-coalgrey" '
 										+ 'data-model-id="' + fgNode.id +'" '
@@ -2552,7 +2567,7 @@ const app = {
 					let productionTagList = '';
 					for(let productionTag of fgNode.productionTags) {
 						if(productionTag === ''){ continue; }
-						let pillId = 'ptag-' + self.crypto.randomUUID();
+						let pillId = 'ptag-' + createUUID(); //self.crypto.randomUUID() before hack implementation
 						productionTagList += '<div id="' + pillId +'" '
 										+ 'class="pill shadow-' + app.collectionViewer.elementColor.productionTag + ' text-coalgrey" '
 										+ 'data-model-id="' + fgNode.id +'" '
@@ -2596,7 +2611,7 @@ const app = {
 					let objectList = '';
 					for(let node of app.collectionViewer.proxyfgData.data.nodes) {
 						if(!node.categories.includes(fgNode.name) || node.type === 'node-category'){ continue; }
-						let pillId = 'object-' + self.crypto.randomUUID();;
+						let pillId = 'object-' + createUUID(); //self.crypto.randomUUID() before hack implementation
 						objectList += '<div id="' + pillId +'" '
 										+ 'class="pill shadow-' + app.collectionViewer.elementColor.object + ' text-coalgrey" '
 										+ 'data-model-id="' + fgNode.id +'" '
@@ -2630,7 +2645,7 @@ const app = {
 					let objectList = '';
 					for(let node of app.collectionViewer.proxyfgData.data.nodes) {
 						if(!node.topics.includes(fgNode.name) || node.type === 'node-topic'){ continue; }
-						let pillId = 'object-' + self.crypto.randomUUID();;
+						let pillId = 'object-' + createUUID(); //self.crypto.randomUUID() before hack implementation
 						objectList += '<div id="' + pillId +'" '
 										+ 'class="pill shadow-' + app.collectionViewer.elementColor.object + ' text-coalgrey" '
 										+ 'data-model-id="' + fgNode.id +'" '
