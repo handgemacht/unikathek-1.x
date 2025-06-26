@@ -1741,7 +1741,7 @@ const app = {
 								"type" : "headline"
 							},
 							{
-								"content" : "Mehr als 100 handgemachte Oberpfälzer Objekte haben in unserer Projektlaufzeit gesammelt. In der Unikathek kann man die meisten davon mitsamt ihrer Geschichten entdecken. Erfahre anhand der Gegenstände, was die Menschen in der Oberpfalz in den letzten 80 Jahren beschäftigte – und was sie immer wieder dazu antrieb und antreibt, Dinge selbst in die Hand zu nehmen.",
+								"content" : "Mehr als 100 handgemachte Oberpfälzer Objekte haben eir in unserer Projektlaufzeit gesammelt. In der Unikathek kann man die meisten davon mitsamt ihrer Geschichten entdecken. Erfahre anhand der Gegenstände, was die Menschen in der Oberpfalz in den letzten 80 Jahren beschäftigte – und was sie immer wieder dazu antrieb und antreibt, Dinge selbst in die Hand zu nehmen.",
 								"fileCopyright" : "",
 								"filename" : "",
 								"imageAlt" : "",
@@ -1749,7 +1749,7 @@ const app = {
 								"type" : "paragraph"
 							},
 							{
-								"content" : "Zum ersten mal hier? Dann schau am besten in unseren Leitfaden. Dort wird die Unikathek mit all ihren wichtigen Funktionen und Werkzeugen erklärt. ",
+								"content" : "Zum ersten Mal hier? Dann schau am besten in unseren Leitfaden. Dort wird die Unikathek mit all ihren wichtigen Funktionen und Werkzeugen erklärt.",
 								"fileCopyright" : "",
 								"filename" : "",
 								"imageAlt" : "",
@@ -1777,7 +1777,7 @@ const app = {
 								"fileCopyright" : "Michaela Stauber",
 								"filename" : "kir tour - Kirwa Austanzen und Musik.jpg",
 								"imageAlt" : "Kirwa Austanzen mit Musikern",
-								"imageCaption" : "[ändern] „Kirwa ist ein Lebensg’fühl“, heißt es auf einem Internetauftritt zum Kulturerbe Kirwa. Doch was ist das genau? Was gehört dazu? Was macht die Kirwa in der Oberpfalz aus? Die beiden kirwaerprobten Jugendlichen Franzi und Florian zeigen es dir und geben Einblicke hinter die Kulissen.",
+								"imageCaption" : "„Kirwa ist ein Lebensg’fühl“, heißt es auf einem Internetauftritt zum Kulturerbe Kirwa. Doch was ist das genau? Was gehört dazu? Was macht die Kirwa in der Oberpfalz aus? Die beiden kirwaerprobten Jugendlichen Franzi und Florian zeigen es dir und geben Einblicke hinter die Kulissen.",
 								"type" : "description+tour"
 							}, 
 							{
@@ -2770,7 +2770,7 @@ const app = {
 
 			texts: {
 				title: 'Die Unikathek',
-				intro: 'Mehr als 100 handgemachte Oberpfälzer Objekte haben in unserer Projektlaufzeit gesammelt. In der Unikathek kann man die meisten davon mitsamt ihrer Geschichten entdecken. Erfahre anhand der Gegenstände, was die Menschen in der Oberpfalz in den letzten 80 Jahren beschäftigte – und was sie immer wieder dazu antrieb und antreibt, Dinge selbst in die Hand zu nehmen.',
+				intro: 'Mehr als 100 handgemachte Oberpfälzer Objekte haben eir in unserer Projektlaufzeit gesammelt. In der Unikathek kann man die meisten davon mitsamt ihrer Geschichten entdecken. Erfahre anhand der Gegenstände, was die Menschen in der Oberpfalz in den letzten 80 Jahren beschäftigte – und was sie immer wieder dazu antrieb und antreibt, Dinge selbst in die Hand zu nehmen.',
 				toursTitle: 'Themen-Touren',
 				collectionTitle: 'Sammlungsinformation'
 			},
@@ -4904,6 +4904,14 @@ const app = {
 										"imageAlt" : "",
 										"imageCaption" : "",
 										"type" : "personal+kir1"
+									},
+									{
+										"content" : "Blumenkranz Lintach",
+										"fileCopyright" : "",
+										"filename" : "0F766D81-3077-4349-92E5-8D10FC642EB8",
+										"imageAlt" : "",
+										"imageCaption" : "",
+										"type" : "link-object"
 									}
 								]
 							}
@@ -4959,6 +4967,14 @@ const app = {
 										"imageAlt" : "",
 										"imageCaption" : "",
 										"type" : "quote"
+									},
+									{
+										"content" : "Küchel Gebenbach",
+										"fileCopyright" : "",
+										"filename" : "4A236316-FD71-F640-8899-A0473D901902",
+										"imageAlt" : "",
+										"imageCaption" : "",
+										"type" : "link-object"
 									}
 								]
 							}
