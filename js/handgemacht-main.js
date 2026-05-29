@@ -1909,6 +1909,8 @@ const app = {
 			show() {
 				if(!this.welcome) {return;}
 
+				app.setSessionStorage('welcome', true);
+
 				this.setWelcomeMessage(this.welcome);
 
 				app.gui.toolbar.toggleToolbar(false);
@@ -11724,12 +11726,6 @@ const app = {
 			this.viewerMode = mode;
 		}
 
-		//handle session storage
-		if(this.showWelcome) {
-			let sessionWelcome = this.getSessionStorage('welcome');
-			!sessionWelcome ? sessionWelcome = this.setSessionStorage('welcome', true) : this.showWelcome = false;
-		}
-
 		//handdle filemaker
 		this.fileMaker ? app.filepaths.files = '../files/' : '';
 		// (this.fileMaker && app.dev) && console.log('dev --- fileMaker active, filepath changed to: ', app.filepaths.files)
@@ -11752,6 +11748,11 @@ const app = {
 		(this.viewerMode === 'cv' && this.tour) ? this.showWelcome = false : '';
 		(this.viewerMode === 'cv' && node) ? this.showWelcome = false : '';
 		(this.viewerMode === 'cv' && isFrom) ? this.showWelcome = false : '';
+
+		//handle session storage after redirect/deep-link suppression
+		if(this.viewerMode === 'cv' && this.showWelcome && this.getSessionStorage('welcome')) {
+			this.showWelcome = false;
+		}
 	},
 
 	setSessionStorage(key, value) {
