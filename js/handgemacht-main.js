@@ -5433,9 +5433,6 @@ const app = {
 						this.topicModelEl.setAttribute('visible', false);
 						this.el.sceneEl.querySelector('a-assets').appendChild(this.topicModelEl);
 
-						this.categoryMarkerModel = this.createCvMarkerModel('category');
-						this.topicMarkerModel = this.createCvMarkerModel('topic');
-
 						//create link category model 
 						this.linkCategoryModelEl = document.createElement('a-entity');
 						this.linkCategoryModelEl.setAttribute('id', 'link-category-model');
@@ -5467,39 +5464,6 @@ const app = {
 						this.linkProductionTagModelEl.setAttribute('material', 'color: #9B9691; shader: flat; opacity: 0.4, transparent: true');
 						this.linkProductionTagModelEl.setAttribute('visible', false);
 						this.el.sceneEl.querySelector('a-assets').appendChild(this.linkProductionTagModelEl);
-					},
-
-					createCvMarkerModel: function(type) {
-						const isCategory = type === 'category';
-						const radius = isCategory ? 4 : 3;
-						const backgroundColor = isCategory ? 0x46AAC8 : 0xFF7850;
-						const marker = new THREE.Group();
-						const background = new THREE.Mesh(
-							new THREE.CircleGeometry(radius, 64),
-							new THREE.MeshBasicMaterial({ color: backgroundColor, side: THREE.DoubleSide })
-						);
-						const iconMaterial = new THREE.MeshBasicMaterial({ color: 0xFAF0E6, side: THREE.DoubleSide });
-
-						marker.add(background);
-
-						function addRect(x, y, width, height) {
-							const rect = new THREE.Mesh(new THREE.PlaneGeometry(width, height), iconMaterial);
-							rect.position.set(x, y, 0.03);
-							marker.add(rect);
-						}
-
-						if(isCategory) {
-							addRect(-1.15, 1.15, 1.35, 1.35);
-							addRect(1.15, 1.15, 1.35, 1.35);
-							addRect(-1.15, -1.15, 1.35, 1.35);
-							addRect(1.15, -1.15, 1.35, 1.35);
-						}else{
-							addRect(0, 0.9, 3.2, 0.32);
-							addRect(0, 0, 3.2, 0.32);
-							addRect(0, -0.9, 3.2, 0.32);
-						}
-
-						return marker;
 					},
 
 					loadJSONModels: function () {
@@ -5915,33 +5879,37 @@ const app = {
 						const fgComp = this.fgComp;
 						this.categoryArray = [];
 
-						//set JSON-model or category-model for each node
+						const categoryModel = this.categoryModelEl.object3D;
+						const topicModel = this.topicModelEl.object3D;
+
+						//set JSON-model or category-/topic-model for each node
 						for(let node of fgComp.nodes){
 							if(node.id === ''){continue;}
 							//set model for categories
 							if(node.type === 'node-category'){
-								node.model = this.categoryMarkerModel.clone(true);
+								node.model = categoryModel.children[0].clone();
+								node.model.material = new THREE.MeshBasicMaterial();
+								node.model.material.copy(categoryModel.children[0].material);
 								continue;
 							}
 							//set model for topics
 							if(node.type === 'node-topic'){
-								node.model = this.topicMarkerModel.clone(true);
+								node.model = topicModel.children[0].clone();
+								node.model.material = new THREE.MeshBasicMaterial();
+								node.model.material.copy(topicModel.children[0].material);
 								continue;
 							}
+							//set model for objects
 							for (let child of scene.children){
 								if(child.name === ''){continue;}
-								//set model for objects
 								if(child.name === node.id && node.type === 'node-object'){
 									node.model = child.children[0].clone();
 								}
-								//skip if no model was set
-								if(!node.model) {continue;}
 							}
 						}
 
 						document.querySelector('#forcegraph').setAttribute('forcegraph', {
-							nodeThreeObject: node => { return node.model },
-							nodeThreeObjectExtend: false
+							nodeThreeObject: node => { return node.model }
 						});
 
 						this.nodeModelSet = true;
