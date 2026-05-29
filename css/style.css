@@ -1979,6 +1979,17 @@ input.cv-search-input:focus {
   outline: none;
 }
 
+/* keyboard-accessible focus indicator (only shows for keyboard navigation, not mouse/touch) */
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+.button:focus-visible,
+.pill:focus-visible,
+[tabindex]:focus-visible {
+  outline: 2px solid #41403F;
+  outline-offset: 2px;
+}
+
 div.autocomplete-list-container {
   position: absolute;
   width: 100%;

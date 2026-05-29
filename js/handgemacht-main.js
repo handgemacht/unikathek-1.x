@@ -316,7 +316,7 @@ const app = {
 		this.handleURLParameter();
 
 		this.isMobile = this.checkMobile();
-		this.isWebXRCapable = this.checkWebXRSupport();
+		this.checkWebXRSupport();
 		this.passiveSupported = this.checkEventlistenerPassiveSupport();
 
 		window.addEventListener('orientationchange', this.handleScreenOrientation);
@@ -1213,6 +1213,7 @@ const app = {
 				this.content.buttons['project'].linkEl = document.createElement('a');
 				this.content.buttons['project'].linkEl.href = 'https://handgemacht.bayern/projekt';
 				this.content.buttons['project'].linkEl.target = '_blank';
+				this.content.buttons['project'].linkEl.rel = 'noopener noreferrer';
 				this.content.buttons.containerEl.appendChild(this.content.buttons['project'].linkEl);
 				this.content.buttons['project'].element = document.createElement('button');
 				this.content.buttons['project'].linkEl.appendChild(this.content.buttons['project'].element);
@@ -1223,6 +1224,7 @@ const app = {
 				this.content.buttons['patronage'].linkEl = document.createElement('a');
 				this.content.buttons['patronage'].linkEl.href = 'https://www.stmfh.bayern.de/heimat/regionale_identitaet/';
 				this.content.buttons['patronage'].linkEl.target = '_blank';
+				this.content.buttons['patronage'].linkEl.rel = 'noopener noreferrer';
 				this.content.buttons.containerEl.appendChild(this.content.buttons['patronage'].linkEl);
 				this.content.buttons['patronage'].element = document.createElement('button');
 				this.content.buttons['patronage'].linkEl.appendChild(this.content.buttons['patronage'].element);
@@ -1238,6 +1240,7 @@ const app = {
 				this.content.links['contact'].element = document.createElement('a');
 				this.content.links['contact'].element.href = 'https://handgemacht.bayern/#Kontakt';
 				this.content.links['contact'].element.target = '_blank';
+				this.content.links['contact'].element.rel = 'noopener noreferrer';
 				this.content.links.containerEl.appendChild(this.content.links['contact'].element);
 				this.content.links['contact'].element.textContent = 'Kontakt';
 	
@@ -1245,6 +1248,7 @@ const app = {
 				this.content.links['imprint'].element = document.createElement('a');
 				this.content.links['imprint'].element.href = 'https://handgemacht.bayern/impressum';
 				this.content.links['imprint'].element.target = '_blank';
+				this.content.links['imprint'].element.rel = 'noopener noreferrer';
 				this.content.links.containerEl.appendChild(this.content.links['imprint'].element);
 				this.content.links['imprint'].element.textContent = 'Impressum';
 	
@@ -1278,15 +1282,14 @@ const app = {
 
 				if(this.button.element) {
 					this.button.element.addEventListener('click', (evt) => {
-						// app.gui.menu.showMenu(); //changed menu button interaction to start message 
-						
+						// app.gui.menu.showMenu(); //changed menu button interaction to start message
 
-						if(self.show){
-							app.gui.message.hideMessage();
-							self.show = false;
+						//derive state from the actual message visibility so closing the welcome via its own button stays in sync
+						const messageVisible = !app.gui.message.containerEl.classList.contains('hide');
+						if(messageVisible){
+							app.gui.message.hideMessage(true);
 						}else{
 							app.collectionViewer.welcome.show();
-							self.show = true;
 						}
 					});
 				}
@@ -3060,6 +3063,7 @@ const app = {
 				document.addEventListener('proxyfgData-update', (event) => {
 					app.dev && console.log('event --- proxyfgData-update - response: updating search autocomplete')
 					let fgData = app.collectionViewer.proxyfgData.data.nodes;
+					this.nodeArray = [];
 					for( let index in fgData){
 						let object = fgData[index];
 						if(object.name){
@@ -3145,45 +3149,27 @@ const app = {
 
 					for(let index in array){
 						let name = array[index].name;
-						for (var i = 0; i < name.length; i++) {
-							if (name.substring(i, i+inputValue.length).toUpperCase() == inputValue.toUpperCase()) {
-								let listItemEl = document.createElement('div');
-								listItemEl.innerHTML = name.substring(0, i);
-								listItemEl.innerHTML += "<strong>" + name.substring(i, i+inputValue.length) + "</strong>";
-								listItemEl.innerHTML += name.substring(i+inputValue.length);
-								array[index].visibility === 'hidden' ? listItemEl.innerHTML += ' (gefiltert)' : '';
-								listItemEl.innerHTML += "<input type='hidden' value='" + name + "'>";
-								autocompleteList.appendChild(listItemEl);
-								if(array[index].visibility === 'hidden'){
-									listItemEl.classList.add('disabled');
-									continue;
-								}
-								listItemEl.addEventListener('click', function(e) {
-									element.value = this.getElementsByTagName("input")[0].value;
-									app.collectionViewer.search.removeAutoCompleteList();
-									app.gui.toolbar.buttonActionSlide(app.collectionViewer.search.button.element);
-									app.collectionViewer.search.executeRequest(name);
-								});
-							}
+						//match the search term anywhere in the name, but only create ONE entry per object
+						let matchIndex = name.toUpperCase().indexOf(inputValue.toUpperCase());
+						if (matchIndex === -1) { continue; }
+
+						let listItemEl = document.createElement('div');
+						listItemEl.innerHTML = name.substring(0, matchIndex);
+						listItemEl.innerHTML += "<strong>" + name.substring(matchIndex, matchIndex+inputValue.length) + "</strong>";
+						listItemEl.innerHTML += name.substring(matchIndex+inputValue.length);
+						array[index].visibility === 'hidden' ? listItemEl.innerHTML += ' (gefiltert)' : '';
+						listItemEl.innerHTML += "<input type='hidden' value='" + name + "'>";
+						autocompleteList.appendChild(listItemEl);
+						if(array[index].visibility === 'hidden'){
+							listItemEl.classList.add('disabled');
+							continue;
 						}
-						// if (name.substring(0, inputValue.length).toUpperCase() == inputValue.toUpperCase()) {
-						// 	let listItemEl = document.createElement('div');
-						// 	listItemEl.innerHTML = "<strong>" + name.substring(0, inputValue.length) + "</strong>";
-						// 	listItemEl.innerHTML += name.substring(inputValue.length);
-						// 	array[index].visibility === 'hidden' ? listItemEl.innerHTML += ' (gefiltert)' : '';
-						// 	listItemEl.innerHTML += "<input type='hidden' value='" + name + "'>";
-						// 	autocompleteList.appendChild(listItemEl);
-							// if(array[index].visibility === 'hidden'){
-							// 	listItemEl.classList.add('disabled');
-							// 	continue;
-							// }
-							// listItemEl.addEventListener('click', function(e) {
-							// 	element.value = this.getElementsByTagName("input")[0].value;
-							// 	app.collectionViewer.search.removeAutoCompleteList();
-							// 	app.gui.toolbar.buttonActionSlide(app.collectionViewer.search.button.element);
-							// 	app.collectionViewer.search.executeRequest(name);
-							// });
-						// }
+						listItemEl.addEventListener('click', function(e) {
+							element.value = this.getElementsByTagName("input")[0].value;
+							app.collectionViewer.search.removeAutoCompleteList();
+							app.gui.toolbar.buttonActionSlide(app.collectionViewer.search.button.element);
+							app.collectionViewer.search.executeRequest(name);
+						});
 					}
 
 					app.dev && console.log('dev --- search debug output: ', debugArray);
@@ -4192,7 +4178,7 @@ const app = {
 									},
 									{
 										"content" : "Hans Schuierer gilt heute als Symbolfigur des friedlichen Widerstandes gegen die WAA. Als damaliger SPD-Landrat, der sich um das wirtschaftliche Wohl des Landkreises sorgte, war er dem viele Arbeitsplätze versprechenden Bauvorhaben gegenüber zunächst nicht abgeneigt. Diese Haltung änderte sich jedoch schlagartig, als er von einem 200 Meter hohen Kamin erfuhr, der auf dem Gelände gebaut werden sollte. „Wozu der Kamin?“, fragte er die Herren von der DWK. „Damit die radioaktiven Schadstoffe möglichst weit verteilt werden“, lautete die Antwort.",
-										"fileCopyright" : "Wikimedia Commons, Author: Mramius, <a class='link text-pearlwhite' href='https://creativecommons.org/licenses/by-sa/4.0/deed.de' target='_blank'>CC By-SA 4.0</a>, <a class='link text-pearlwhite' href='https://commons.wikimedia.org/wiki/File:KurtPetzoldHansSchuierer.jpg' target='_blank'>KurtPetzoldHansSchuierer.jpg</a> (Ausschnitt)",
+										"fileCopyright" : "Wikimedia Commons, Author: Mramius, <a class='link text-pearlwhite' href='https://creativecommons.org/licenses/by-sa/4.0/deed.de' target='_blank' rel='noopener noreferrer'>CC By-SA 4.0</a>, <a class='link text-pearlwhite' href='https://commons.wikimedia.org/wiki/File:KurtPetzoldHansSchuierer.jpg' target='_blank' rel='noopener noreferrer'>KurtPetzoldHansSchuierer.jpg</a> (Ausschnitt)",
 										"filename" : "waa tour - Hans Schuierer.jpg",
 										"imageAlt" : "Foto von Hans Schuirer",
 										"imageCaption" : "Hans Schuierer, Landrat von Schwandorf, bei einer Anti-Atomkraft-Kundgebung.",
@@ -4341,7 +4327,7 @@ const app = {
 									},
 									{	
 										"content" : "",
-										"fileCopyright" : "Wikimedia Commons, Author: Alois Köppl, Gleiritsch <a class='link text-pearlwhite' href='https://online-2000.de/'  target='_blank'>online-2000.de</a>, <a class='link text-pearlwhite' href='https://creativecommons.org/licenses/by/3.0/deed.en' target='_blank'>CC BY 3.0</a>, <a class='link text-pearlwhite' href='https://commons.wikimedia.org/wiki/File:Wackersdorf_Gewerbegebiet_Westlicher_Tax%C3%B6ldener_Forst_06_09_2013.jpg' target='_blank'>Wackersdorf Gewerbegebiet Westlicher Taxöldener Forst 06 09 2013.jpg</a>",
+										"fileCopyright" : "Wikimedia Commons, Author: Alois Köppl, Gleiritsch <a class='link text-pearlwhite' href='https://online-2000.de/'  target='_blank' rel='noopener noreferrer'>online-2000.de</a>, <a class='link text-pearlwhite' href='https://creativecommons.org/licenses/by/3.0/deed.en' target='_blank' rel='noopener noreferrer'>CC BY 3.0</a>, <a class='link text-pearlwhite' href='https://commons.wikimedia.org/wiki/File:Wackersdorf_Gewerbegebiet_Westlicher_Tax%C3%B6ldener_Forst_06_09_2013.jpg' target='_blank' rel='noopener noreferrer'>Wackersdorf Gewerbegebiet Westlicher Taxöldener Forst 06 09 2013.jpg</a>",
 										"filename" : "waa tour - wackersdorf gewerbegebiet.jpg",
 										"imageAlt" : "Wackersdorfer Gewerbegebiet",
 										"imageCaption" : "Statt einer WAA entstand bei Wackersdorf letztendlich ein Gewerbegebiet mit zahlreichen Arbeitsplätzen.",
@@ -4410,7 +4396,7 @@ const app = {
 										"type" : "literature"
 									},
 									{
-										"content" : "Duschinger, Oskar/Zech-Kleber, Bernhard von: Wiederaufbereitungsanlage Wackersdorf, URL: <a href='https://www.historisches-lexikon-bayerns.de/Lexikon/Wiederaufbereitungsanlage_Wackersdorf' target='_blank'>https://www.historisches-lexikon-bayerns.de/Lexikon/Wiederaufbereitungsanlage_Wackersdorf</a>.",
+										"content" : "Duschinger, Oskar/Zech-Kleber, Bernhard von: Wiederaufbereitungsanlage Wackersdorf, URL: <a href='https://www.historisches-lexikon-bayerns.de/Lexikon/Wiederaufbereitungsanlage_Wackersdorf' target='_blank' rel='noopener noreferrer'>https://www.historisches-lexikon-bayerns.de/Lexikon/Wiederaufbereitungsanlage_Wackersdorf</a>.",
 										"fileCopyright" : "",
 										"filename" : "",
 										"imageAlt" : "",
@@ -4418,7 +4404,7 @@ const app = {
 										"type" : "literature"
 									},
 									{
-										"content" : "Stauber, Michaela: Das Franziskusmarterl bei Wackersdorf. 3D-Scan eines Objekts des Widerstands, URL: <a href='https://wissen.freilandmuseum-oberpfalz.de/franziskusmarterl-3d-scan-hand-gemacht/' target='_blank'>https://wissen.freilandmuseum-oberpfalz.de/franziskusmarterl-3d-scan-hand-gemacht/</a>.",
+										"content" : "Stauber, Michaela: Das Franziskusmarterl bei Wackersdorf. 3D-Scan eines Objekts des Widerstands, URL: <a href='https://wissen.freilandmuseum-oberpfalz.de/franziskusmarterl-3d-scan-hand-gemacht/' target='_blank' rel='noopener noreferrer'>https://wissen.freilandmuseum-oberpfalz.de/franziskusmarterl-3d-scan-hand-gemacht/</a>.",
 										"fileCopyright" : "",
 										"filename" : "",
 										"imageAlt" : "",
@@ -4426,7 +4412,7 @@ const app = {
 										"type" : "literature"
 									},
 									{
-										"content" : "BR-Beitrag über Irmgard Gietl: <a href='https://www.br.de/br-fernsehen/sendungen/lebenslinien/irmgard-und-die-widerstandssocken-irmgard-gietl-wackersdorf-oberpfalz-ganze-folge102.html' target='_blank'>https://www.br.de/br-fernsehen/sendungen/lebenslinien/irmgard-und-die-widerstandssocken-irmgard-gietl-wackersdorf-oberpfalz-ganze-folge102.html</a>.",
+										"content" : "BR-Beitrag über Irmgard Gietl: <a href='https://www.br.de/br-fernsehen/sendungen/lebenslinien/irmgard-und-die-widerstandssocken-irmgard-gietl-wackersdorf-oberpfalz-ganze-folge102.html' target='_blank' rel='noopener noreferrer'>https://www.br.de/br-fernsehen/sendungen/lebenslinien/irmgard-und-die-widerstandssocken-irmgard-gietl-wackersdorf-oberpfalz-ganze-folge102.html</a>.",
 										"fileCopyright" : "",
 										"filename" : "",
 										"imageAlt" : "",
@@ -4434,7 +4420,7 @@ const app = {
 										"type" : "literature"
 									},
 									{
-										"content" : "Zeitzeugeninterviews des Hauses der Bayerischen Geschichte: <a href='https://hdbg.eu/zeitzeugen/themen/waa-wackersdorf/60' target='_blank'>https://hdbg.eu/zeitzeugen/themen/waa-wackersdorf/60</a>.",
+										"content" : "Zeitzeugeninterviews des Hauses der Bayerischen Geschichte: <a href='https://hdbg.eu/zeitzeugen/themen/waa-wackersdorf/60' target='_blank' rel='noopener noreferrer'>https://hdbg.eu/zeitzeugen/themen/waa-wackersdorf/60</a>.",
 										"fileCopyright" : "",
 										"filename" : "",
 										"imageAlt" : "",
@@ -5080,7 +5066,7 @@ const app = {
 										"type" : "literature"
 									},
 									{
-										"content" : "Stauber, Michaela: Materialisierte immaterielle Kultur. Bedeutungen und Funktionen selbstgemachter Brauchobjekte am Beispiel der Kirwa, URL: <a href='https://wissen.freilandmuseum-oberpfalz.de/materialisierte-immaterielle-kultur/' target='_blank'>https://wissen.freilandmuseum-oberpfalz.de/materialisierte-immaterielle-kultur/</a>.",
+										"content" : "Stauber, Michaela: Materialisierte immaterielle Kultur. Bedeutungen und Funktionen selbstgemachter Brauchobjekte am Beispiel der Kirwa, URL: <a href='https://wissen.freilandmuseum-oberpfalz.de/materialisierte-immaterielle-kultur/' target='_blank' rel='noopener noreferrer'>https://wissen.freilandmuseum-oberpfalz.de/materialisierte-immaterielle-kultur/</a>.",
 										"fileCopyright" : "",
 										"filename" : "",
 										"imageAlt" : "",
@@ -5088,7 +5074,7 @@ const app = {
 										"type" : "literature"
 									},
 									{
-										"content" : "Stauber, Michaela: Kirwabaum und Kücheln. Bedeutungen und Funktionen selbstgemachter Brauchobjekte, URL: <a href='https://wissen.freilandmuseum-oberpfalz.de/kirwabaum-und-kuecheln-bedeutungen-und-funktionen/' target='_blank'>https://wissen.freilandmuseum-oberpfalz.de/kirwabaum-und-kuecheln-bedeutungen-und-funktionen/</a>.",
+										"content" : "Stauber, Michaela: Kirwabaum und Kücheln. Bedeutungen und Funktionen selbstgemachter Brauchobjekte, URL: <a href='https://wissen.freilandmuseum-oberpfalz.de/kirwabaum-und-kuecheln-bedeutungen-und-funktionen/' target='_blank' rel='noopener noreferrer'>https://wissen.freilandmuseum-oberpfalz.de/kirwabaum-und-kuecheln-bedeutungen-und-funktionen/</a>.",
 										"fileCopyright" : "",
 										"filename" : "",
 										"imageAlt" : "",
@@ -5096,7 +5082,7 @@ const app = {
 										"type" : "literature"
 									},
 									{
-										"content" : "Website des Landratsamtes Amberg-Sulzbach zum Kulturerbe Kirwa im Amberg-Sulzbacher Land: <a href='https://kulturerbe-kirwa.de/' target='_blank'>https://kulturerbe-kirwa.de/</a>.",
+										"content" : "Website des Landratsamtes Amberg-Sulzbach zum Kulturerbe Kirwa im Amberg-Sulzbacher Land: <a href='https://kulturerbe-kirwa.de/' target='_blank' rel='noopener noreferrer'>https://kulturerbe-kirwa.de/</a>.",
 										"fileCopyright" : "",
 										"filename" : "",
 										"imageAlt" : "",
@@ -5447,6 +5433,9 @@ const app = {
 						this.topicModelEl.setAttribute('visible', false);
 						this.el.sceneEl.querySelector('a-assets').appendChild(this.topicModelEl);
 
+						this.categoryMarkerModel = this.createCvMarkerModel('category');
+						this.topicMarkerModel = this.createCvMarkerModel('topic');
+
 						//create link category model 
 						this.linkCategoryModelEl = document.createElement('a-entity');
 						this.linkCategoryModelEl.setAttribute('id', 'link-category-model');
@@ -5480,6 +5469,39 @@ const app = {
 						this.el.sceneEl.querySelector('a-assets').appendChild(this.linkProductionTagModelEl);
 					},
 
+					createCvMarkerModel: function(type) {
+						const isCategory = type === 'category';
+						const radius = isCategory ? 4 : 3;
+						const backgroundColor = isCategory ? 0x46AAC8 : 0xFF7850;
+						const marker = new THREE.Group();
+						const background = new THREE.Mesh(
+							new THREE.CircleGeometry(radius, 64),
+							new THREE.MeshBasicMaterial({ color: backgroundColor, side: THREE.DoubleSide })
+						);
+						const iconMaterial = new THREE.MeshBasicMaterial({ color: 0xFAF0E6, side: THREE.DoubleSide });
+
+						marker.add(background);
+
+						function addRect(x, y, width, height) {
+							const rect = new THREE.Mesh(new THREE.PlaneGeometry(width, height), iconMaterial);
+							rect.position.set(x, y, 0.03);
+							marker.add(rect);
+						}
+
+						if(isCategory) {
+							addRect(-1.15, 1.15, 1.35, 1.35);
+							addRect(1.15, 1.15, 1.35, 1.35);
+							addRect(-1.15, -1.15, 1.35, 1.35);
+							addRect(1.15, -1.15, 1.35, 1.35);
+						}else{
+							addRect(0, 0.9, 3.2, 0.32);
+							addRect(0, 0, 3.2, 0.32);
+							addRect(0, -0.9, 3.2, 0.32);
+						}
+
+						return marker;
+					},
+
 					loadJSONModels: function () {
 						const fgData = '';
 						const fileJSON = app.filepaths.files + app.filepaths.collectionJSON + '?v=' + app.version;
@@ -5497,7 +5519,10 @@ const app = {
 
 						//fetch json data from file
 						const objectsJSON = fetch(fileJSON)
-							.then((response) => response.json())
+							.then((response) => {
+								if(!response.ok) { throw new Error('Response status: ' + response.status); }
+								return response.json();
+							})
 							.then((json) => {
 								this.json = json;
 								// app.dev && console.log(`dev --- fetching ${fileJSON}:`, json)
@@ -5506,14 +5531,14 @@ const app = {
 
 								let loadingTextEl = null;
 								let loadingText = '';
-								let loadedCount = 0;	
+								let loadedCount = 0;
 
-								if(typeof app.gui.loadingScreen.animation.textEl != null){
+								if(app.gui.loadingScreen.animation.percentEl){
 									loadingTextEl = app.gui.loadingScreen.animation.percentEl;
 									loadingText = loadingTextEl.innerHTML;
 									loadingTextEl.innerHTML = percentLoaded(loadedCount, json.objects.length) + '%';
 								}
-								
+
 								for(let object of json.objects){
 									if(object.quality512){
 										app.gltfLoader.load(app.filepaths.files + object.quality512, (gltf) => {
@@ -5521,11 +5546,11 @@ const app = {
 											gltf.scene.altName = object.name;
 											gltf.scene.visible = false;
 											scene.add( gltf.scene );
-										}, (xhr) =>{ 
+										}, (xhr) =>{
 											// (xhr.loaded/xhr.total === 1) && app.dev ? console.log( ( 'dev --- load model: ' + object.name + ' - ' + xhr.loaded / xhr.total * 100 ) + '% loaded' ) : '';
 											xhr.loaded/xhr.total === 1 ? loadedCount = loadedCount + 1 : '';
-											loadingTextEl.innerHTML = percentLoaded(loadedCount, json.objects.length) + '%';
-										}, (error) => {		
+											loadingTextEl ? loadingTextEl.innerHTML = percentLoaded(loadedCount, json.objects.length) + '%' : '';
+										}, (error) => {
 											console.log( 'An error happened: ', error );
 										});
 									}
@@ -5537,6 +5562,11 @@ const app = {
 									app.dev && console.log('event --- JSON-models-loaded - call')
 									document.querySelector('a-scene').dispatchEvent(event);
 								};
+							})
+							.catch((error) => {
+								app.dev && console.error('dev --- collection fetch error: ', error);
+								app.gui.loadingScreen.hideLoadingScreen();
+								app.handleError('cv-002');
 							});
 					},
 
@@ -5885,29 +5915,24 @@ const app = {
 						const fgComp = this.fgComp;
 						this.categoryArray = [];
 
-						const categoryModel = this.categoryModelEl.object3D;
-						const topicModel = this.topicModelEl.object3D;
-
 						//set JSON-model or category-model for each node
 						for(let node of fgComp.nodes){
 							if(node.id === ''){continue;}
+							//set model for categories
+							if(node.type === 'node-category'){
+								node.model = this.categoryMarkerModel.clone(true);
+								continue;
+							}
+							//set model for topics
+							if(node.type === 'node-topic'){
+								node.model = this.topicMarkerModel.clone(true);
+								continue;
+							}
 							for (let child of scene.children){
 								if(child.name === ''){continue;}
 								//set model for objects
 								if(child.name === node.id && node.type === 'node-object'){
 									node.model = child.children[0].clone();
-								}
-								//set model for categories
-								if(node.type === 'node-category'){
-									node.model = categoryModel.children[0].clone();
-									node.model.material = new THREE.MeshBasicMaterial();
-									node.model.material.copy(categoryModel.children[0].material);
-								}
-								//set model for topics
-								if(node.type === 'node-topic'){
-									node.model = topicModel.children[0].clone();
-									node.model.material = new THREE.MeshBasicMaterial();
-									node.model.material.copy(topicModel.children[0].material);
 								}
 								//skip if no model was set
 								if(!node.model) {continue;}
@@ -5915,7 +5940,8 @@ const app = {
 						}
 
 						document.querySelector('#forcegraph').setAttribute('forcegraph', {
-							nodeThreeObject: node => { return node.model }
+							nodeThreeObject: node => { return node.model },
+							nodeThreeObjectExtend: false
 						});
 
 						this.nodeModelSet = true;
@@ -8052,7 +8078,6 @@ const app = {
 				const response = await fetch(url, headers);
 				if(!response.ok) {
 					throw new Error(`Response status: ${response.status}`);
-					return false;
 				}
 				await response.json().then((json) => {
 					app.modelViewer.proxyJSON.data = json;
@@ -8085,7 +8110,6 @@ const app = {
 				// app.dev && console.log('dev --- checkARSupport:', false);
 				return false;
 			}
-			return false;
 		},
 
 		createElements() {
@@ -8239,9 +8263,8 @@ const app = {
 			this.assets.sprite = document.createElement('img');
 			this.assets.element.appendChild(this.assets.sprite);
 			this.assets.sprite.id = 'sprite';
-			this.assets.sprite.crossOrigin = 'anonymous';
-			// TODO our own sprite
-			this.assets.sprite.src = 'https://cdn.glitch.global/421736eb-f719-4a40-8df3-054eca30d277/spark.png?v=1715082340035';
+			//self-hosted 4x4 spark spritesheet (replaces the former external Glitch CDN dependency)
+			this.assets.sprite.src = app.filepaths.assets + 'ar-spark-spritesheet.png';
 
 			this.assets.drop = document.createElement('img');
 			this.assets.element.appendChild(this.assets.drop);
@@ -8792,7 +8815,12 @@ const app = {
 				//after object is placed, gets information if first contact from local storage
 				self.el.addEventListener("placingAchieved", function (e) {
 				  helpCont.classList.remove("hide");
-				  let storedValue = JSON.parse(localStorage.getItem('firstContact'));
+				  let storedValue = null;
+				  try {
+					storedValue = JSON.parse(localStorage.getItem('firstContact'));
+				  } catch (err) {
+					storedValue = null;
+				  }
 				  if (storedValue === false) self.firstContact = storedValue;
 				  else self.firstContact = e.detail;
 				  if (self.firstContact) {
@@ -9103,11 +9131,14 @@ const app = {
 			  loadJSON: function () {
 				let self = this;
 				fetch(app.filepaths.files + 'json/' + app.primaryKey + '.json')
-				  .then((response) => response.json())
+				  .then((response) => {
+					if(!response.ok) { throw new Error('Response status: ' + response.status); }
+					return response.json();
+				  })
 				  .then((json) => {
 					self.loadModel(json);
 					// init mission if tasks is declared
-					if(!json.appData.tasks) { return; }
+					if(!json.appData || !json.appData.tasks) { return; }
 					if (json.appData.tasks.length > 0) {
 					  self.loadMissions(json);
 					  self.missionExisting = true;
@@ -9123,6 +9154,7 @@ const app = {
 				  })
 				  .catch((error) => {
 					app.dev && console.error("There was a problem with the fetch operation:", error);
+					app.handleError('mv-002');
 				  });
 			  },
 
@@ -9151,6 +9183,7 @@ const app = {
 				  // called when loading has errors
 				  function (error) {
 					app.dev && console.log('An error happened', error);
+					app.handleError('mv-003');
 				  }
 				)
 			  },
@@ -9905,6 +9938,9 @@ const app = {
 				self.refSpace = null;
 				self.firstTime = true;
 				self.objectContainerEl = document.getElementById("ar-object-container");
+				//reused each frame in tick() to avoid per-frame allocation
+				self.inputMat = new THREE.Matrix4();
+				self.hitPosition = new THREE.Vector3();
 
 				self.placeObject = self.placeObject.bind(self);
 				self.placeEnd = self.placeEnd.bind(self);
@@ -9912,9 +9948,9 @@ const app = {
 				self.showMessage = self.showMessage.bind(self);
 
 				self.el.sceneEl.renderer.xr.addEventListener("sessionend", (ev) => {
-				  self.el.viewerSpace = null;
-				  self.el.refSpace = null;
-				  self.el.xrHitTestSource = null;
+				  self.viewerSpace = null;
+				  self.refSpace = null;
+				  self.xrHitTestSource = null;
 				});
 
 				self.el.sceneEl.addEventListener("ready-for-placing", (ev) => {
@@ -10064,12 +10100,10 @@ const app = {
 
 					  let pose = hitTestResults[0].getPose(this.refSpace);
 
-					  let inputMat = new THREE.Matrix4();
-					  inputMat.fromArray(pose.transform.matrix);
-
-					  let position = new THREE.Vector3();
-					  position.setFromMatrixPosition(inputMat);
-					  this.el.object3D.position.set(position.x, position.y, position.z);
+					  //reuse cached objects to avoid per-frame allocation
+					  this.inputMat.fromArray(pose.transform.matrix);
+					  this.hitPosition.setFromMatrixPosition(this.inputMat);
+					  this.el.object3D.position.set(this.hitPosition.x, this.hitPosition.y, this.hitPosition.z);
 					}
 				  }
 				}
@@ -10439,30 +10473,33 @@ const app = {
 
 				//wait until gtlf model is loaded
 				self.el.addEventListener("model-loaded", function () {
+				  //compute the union bounding box over ALL meshes once (handles multi-mesh models correctly)
+				  let hasMesh = false;
 				  app.arViewer.originalObject.traverse(function (child) {
-					if (child.isMesh) {
-					  boundingBox.setFromObject(child);
-					  boundingBox.getSize(size);
-					  //get radius
-					  let radius = size.x > size.z ? size.x / 2 : size.z / 2;
-					  let radiusWide = radius + (radius / 6);
-					  let largest = Math.max(size.x, size.y, size.z);
-					  //set radius
-					  ringEl.setAttribute("geometry", {
-						radius: radiusWide,
-					  });
-					  ringEl.children[0].object3D.position.x = radiusWide;
-					  ringEl.children[0].setAttribute("geometry", "radius", radiusWide);
-					  ringEl.children[1].object3D.position.x = radiusWide;
-					  ringEl.children[1].setAttribute("geometry", "radius", radiusWide / 6);
-					  //emit radius to rotation handler
-					  self.el.emit(
-						"radius-set",
-						{ radius: radiusWide, maxSize: largest },
-						true
-					  );
-					}
+					if (child.isMesh) { hasMesh = true; }
 				  });
+				  if (!hasMesh) { return; }
+
+				  boundingBox.setFromObject(app.arViewer.originalObject);
+				  boundingBox.getSize(size);
+				  //get radius
+				  let radius = size.x > size.z ? size.x / 2 : size.z / 2;
+				  let radiusWide = radius + (radius / 6);
+				  let largest = Math.max(size.x, size.y, size.z);
+				  //set radius
+				  ringEl.setAttribute("geometry", {
+					radius: radiusWide,
+				  });
+				  ringEl.children[0].object3D.position.x = radiusWide;
+				  ringEl.children[0].setAttribute("geometry", "radius", radiusWide);
+				  ringEl.children[1].object3D.position.x = radiusWide;
+				  ringEl.children[1].setAttribute("geometry", "radius", radiusWide / 6);
+				  //emit radius to rotation handler (once)
+				  self.el.emit(
+					"radius-set",
+					{ radius: radiusWide, maxSize: largest },
+					true
+				  );
 				});
 			  },
 			});
@@ -11298,6 +11335,8 @@ const app = {
 				  self.camera = self.el.camera;
 				  self.cameraPos = new THREE.Vector3();
 				  self.cameraDir = new THREE.Vector3();
+				  //reused each frame in tick() to avoid per-frame allocation
+				  self.vectorInFrontOfCamera = new THREE.Vector3();
 				  //objectOverlay, plane Object
 				  self.objectOverlay = new THREE.Group();
 				  self.poGroup = new THREE.Group();
@@ -11423,6 +11462,9 @@ const app = {
 				this.clipping = this.data.clipping;
 				this.shot = this.data.shot;
 
+				//clipping objects (renderer, oldObject, objectOverlay …) are only set once the model is loaded (radius-set); bail out until then
+				if (this.enabled && !this.renderer) { return; }
+
 				if (this.enabled) {
 				  if (this.clipping) {
 					this.renderer.localClippingEnabled = true;
@@ -11488,9 +11530,11 @@ const app = {
 				  this.camera.getWorldDirection(this.cameraDir);
 				}
 
-				this.vectorInFrontOfCamera = this.cameraPos
-				  .clone()
-				  .add(this.cameraDir.clone().multiplyScalar(this.distance));
+				//reuse cached vector to avoid per-frame allocation: cameraPos + cameraDir * distance
+				this.vectorInFrontOfCamera
+				  .copy(this.cameraDir)
+				  .multiplyScalar(this.distance)
+				  .add(this.cameraPos);
 
 				//set the plane with cameraDirection and a point in front of the camera
 
@@ -11605,7 +11649,7 @@ const app = {
 
 			if(content.type === 'audio'){
 				const playerHTML = '<div class="content-audio"><audio controls><source src="' + app.filepaths.files + app.filepaths.annotationMedia + content.filename + '" type="audio/mpeg"></audio></div>';
-				const transcriptHTML = '<h7 class="subheadline text-smokegrey">Transkript:</h7><p class="content-text quote">' + content.content + '</p><br/>';
+				const transcriptHTML = '<h6 class="subheadline text-smokegrey">Transkript:</h6><p class="content-text quote">' + content.content + '</p><br/>';
 
 				let audioHTML = playerHTML;
 				content.content ? audioHTML += transcriptHTML : '';
@@ -11790,16 +11834,16 @@ const app = {
 	},
 
 	checkWebXRSupport() {
-		//test if WebXR AR is supported
-		if(navigator.xr){
-			return true;
+		//test if WebXR AR (immersive-ar) is actually supported; updates asynchronously
+		this.isWebXRCapable = false;
+		if(navigator.xr && navigator.xr.isSessionSupported){
 			navigator.xr.isSessionSupported('immersive-ar').then((isSupported) => {
+				this.isWebXRCapable = isSupported;
 				// app.dev && console.log('dev --- checkWebXRSupport:', isSupported);
 				
+			}).catch(() => {
+				this.isWebXRCapable = false;
 			});
-		}else{
-			// app.dev && console.log('dev --- checkWebXRSupport:', false);
-			return false;
 		}
 	},
 
@@ -11841,6 +11885,13 @@ const app = {
 			this.gui.error.showError();
 		}
 
+		if(error === 'cv-002'){
+			consoleOutput = {};
+			this.gui.error.content.value = `<h3>Fehler-Code: ${error}</h3>\n<p>Die Sammlung konnte nicht geladen werden. Bitte prüfe deine Internetverbindung und lade die Seite neu.</p>`;
+			this.gui.error.button.label = 'OK';
+			this.gui.error.showError();
+		}
+
 
 
 
@@ -11863,6 +11914,13 @@ const app = {
 		if(error === 'mv-002'){
 			consoleOutput = { primaryKey: this.primaryKey };
 			this.gui.error.content.value = `<h3>Fehler-Code: ${error}</h3>\n<p>Laden der JSON-Datei (Objekt-Id: ${this.primaryKey}) fehlgeschlagen. </p>`;
+			this.gui.error.button.label = 'OK';
+			this.gui.error.showError();
+		}
+
+		if(error === 'mv-003'){
+			consoleOutput = { primaryKey: this.primaryKey };
+			this.gui.error.content.value = `<h3>Fehler-Code: ${error}</h3>\n<p>Laden des 3D-Modells (Objekt-Id: ${this.primaryKey}) fehlgeschlagen. </p>`;
 			this.gui.error.button.label = 'OK';
 			this.gui.error.showError();
 		}
