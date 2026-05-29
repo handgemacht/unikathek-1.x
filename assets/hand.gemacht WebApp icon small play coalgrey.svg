@@ -1,12 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg id="content" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 47.72">
-  <defs>
-    <style>
-      .cls-1 {
-        fill: #41403f;
-        stroke-width: 0px;
-      }
-    </style>
-  </defs>
-  <path class="cls-1" d="M40.3,19.27L17.27,5.97c-3.38-1.95-7.6.49-7.6,4.39v26.58c0,3.9,4.22,6.34,7.6,4.39l23.02-13.29c3.38-1.95,3.38-6.83,0-8.78Z"/>
+<svg id="content" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 47.72" width="48" height="47.72">
+  <path fill="#41403f" stroke-width="0" d="M40.3,19.27L17.27,5.97c-3.38-1.95-7.6.49-7.6,4.39v26.58c0,3.9,4.22,6.34,7.6,4.39l23.02-13.29c3.38-1.95,3.38-6.83,0-8.78Z"/>
 </svg>

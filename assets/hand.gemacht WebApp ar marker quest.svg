@@ -1,24 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg id="content" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 47.72">
-  <defs>
-    <style>
-      .cls-1 {
-        fill: linen;
-      }
-
-      .cls-1, .cls-2 {
-        stroke-width: 0px;
-      }
-
-      .cls-2 {
-        fill: #9b9691;
-      }
-    </style>
-  </defs>
-  <path class="cls-2" d="M22.07,44.69c-1.1,0-2-.9-2-2v1c0,1.1.9,2,2,2h6.55v-1h-6.55Z"/>
-  <path class="cls-2" d="M22.07,29.98c-1.1,0-2-.9-2-2v1c0,1.1.9,2,2,2h6.55v-1h-6.55Z"/>
+<svg id="content" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 47.72" width="48" height="47.72">
+  <path stroke-width="0" fill="#9b9691" d="M22.07,44.69c-1.1,0-2-.9-2-2v1c0,1.1.9,2,2,2h6.55v-1h-6.55Z"/>
+  <path stroke-width="0" fill="#9b9691" d="M22.07,29.98c-1.1,0-2-.9-2-2v1c0,1.1.9,2,2,2h6.55v-1h-6.55Z"/>
   <g>
-    <path class="cls-1" d="M26.63,37.19h-6.55v5.5c0,1.1.9,2,2,2h6.55v-5.5c0-1.1-.9-2-2-2Z"/>
-    <path class="cls-1" d="M26.63,2.03h-6.55v25.95c0,1.1.9,2,2,2h6.55V4.03c0-1.1-.9-2-2-2Z"/>
+    <path fill="linen" stroke-width="0" d="M26.63,37.19h-6.55v5.5c0,1.1.9,2,2,2h6.55v-5.5c0-1.1-.9-2-2-2Z"/>
+    <path fill="linen" stroke-width="0" d="M26.63,2.03h-6.55v25.95c0,1.1.9,2,2,2h6.55V4.03c0-1.1-.9-2-2-2Z"/>
   </g>
 </svg>
