@@ -1457,8 +1457,8 @@ const app = {
 			setButton(setup) {
 				if(!setup) {return;}
 				let id = setup.id;
-				if(typeof document.querySelector(id) != 'undefined' && document.querySelector(id).children.length != 0){
-					let element = document.querySelector(id);
+				let element = document.querySelector(id);
+				if(element && element.children.length != 0){
 					element.setAttribute('data-colors', JSON.stringify(setup.colors));
 					element.setAttribute('data-func', setup.func);
 					element.setAttribute('data-action', setup.action.type);
@@ -1477,8 +1477,8 @@ const app = {
 			}, 
 
 			removeButton(id) {
-				if(typeof document.querySelector(id) != 'undefined' && document.querySelector(id).children.length != 0){
-					let element = document.querySelector(id);
+				let element = document.querySelector(id);
+				if(element && element.children.length != 0){
 					let action = element.getAttribute('data-action');
 					element.removeAttribute('data-action');
 					element.className = 'gui-toolbar-button hide';
@@ -3076,7 +3076,7 @@ const app = {
 			}, 
 
 			createElements() {
-				if(typeof document.querySelector(this.buttonSetup.id) === 'undefined'){ return; };
+				if(!document.querySelector(this.buttonSetup.id)){ return; };
 
 				this.button = {};
 				this.button.element = document.querySelector(this.buttonSetup.id);
@@ -3887,7 +3887,7 @@ const app = {
 										"filename" : "",
 										"imageAlt" : "",
 										"imageCaption" : "",
-										"type" : "personal+wolfgang"
+										"type" : "personal+waa"
 									}
 								]
 							}
@@ -3950,7 +3950,7 @@ const app = {
 										"filename" : "",
 										"imageAlt" : "",
 										"imageCaption" : "",
-										"type" : "personal+wolfgang"
+										"type" : "personal+waa"
 									}
 								]
 							}
@@ -3997,7 +3997,7 @@ const app = {
 										"filename" : "",
 										"imageAlt" : "",
 										"imageCaption" : "",
-										"type" : "personal+wolfgang"
+										"type" : "personal+waa"
 									},
 									{
 										"content" : "Weil man das Projekt auf dem rechtlichen Wege verhindern möchte, wird insbesondere für die Zusammenarbeit mit einem Anwalt Geld gebraucht. Darüber hinaus fallen Kosten für die Öffentlichkeitsarbeit, etwa für den Druck von Flugblättern, sowie für Fachbücher an. Auch Sprit- und Telefonkosten, die privat nicht tragbar wären, sollen möglichst erstattet werden. Die Aktivisten sind daher froh um jede Mark, die in die Kasse der Bürgerinitiative fließt, und schlagen mitunter kreative Wege ein. So werden bei Demonstrationen zum Beispiel selbstgemachte Buttons verkauft – und gehen weg wie warme Semmeln.",
@@ -4084,7 +4084,7 @@ const app = {
 										"filename" : "",
 										"imageAlt" : "",
 										"imageCaption" : "",
-										"type" : "personal+wolfgang"
+										"type" : "personal+waa"
 									}
 								]
 							}
@@ -4155,7 +4155,7 @@ const app = {
 										"filename" : "",
 										"imageAlt" : "",
 										"imageCaption" : "",
-										"type" : "personal+wolfgang"
+										"type" : "personal+waa"
 									}
 								]
 							}
@@ -4304,7 +4304,7 @@ const app = {
 										"filename" : "",
 										"imageAlt" : "",
 										"imageCaption" : "",
-										"type" : "personal+wolfgang"
+										"type" : "personal+waa"
 									}
 								]
 							}
@@ -7267,10 +7267,12 @@ const app = {
 
 			app.gui.toolbar.setButton(this.info.buttonSetup);
 			app.gui.toolbar.setButton(this.contextStory.buttonSetup);
-			app.gui.toolbar.button[1].addEventListener('click', (e) => app.modelViewer.contextStory.setContextStory() );
+			this.contextStoryClickHandler = (e) => app.modelViewer.contextStory.setContextStory();
+			app.gui.toolbar.button[1].addEventListener('click', this.contextStoryClickHandler);
 			app.gui.toolbar.setButton(this.measurement.buttonSetup);
 			this.measurement.init();
-			app.gui.toolbar.button[2].addEventListener('click', (e) => app.modelViewer.measurement.toggleMeasurements() );
+			this.measurementClickHandler = (e) => app.modelViewer.measurement.toggleMeasurements();
+			app.gui.toolbar.button[2].addEventListener('click', this.measurementClickHandler);
 			app.gui.toolbar.setButton(this.ar.buttonSetup);
 
 			this.initialized = true;
@@ -8101,7 +8103,7 @@ const app = {
 			this.element.setAttribute('orbit-sensitivity', '2');
 			this.element.setAttribute('zoom-sensitivity', '0.01');
 			this.element.setAttribute('min-camera-orbit', '-Infinity 15deg 0.2m');
-			this.element.setAttribute('max-camera-orbit', '-Infinity 165ddeg 12.5m');
+			this.element.setAttribute('max-camera-orbit', '-Infinity 165deg 12.5m');
 			this.element.setAttribute('camera-target', '');
 			this.element.setAttribute('field-of-view', '');
 			this.element.setAttribute('interpolation-decay', '150');
@@ -8126,8 +8128,8 @@ const app = {
 
 		removeElements() {
 			this.element.remove();
-			app.gui.toolbar.button[1].removeEventListener('click', (e) => app.modelViewer.contextStory.setContextStory() );
-			app.gui.toolbar.button[2].removeEventListener('click', (e) => app.modelViewer.measurement.toggleMeasurements() );
+			app.gui.toolbar.button[1].removeEventListener('click', this.contextStoryClickHandler);
+			app.gui.toolbar.button[2].removeEventListener('click', this.measurementClickHandler);
 		},
 
 		setLoadingText(event) {
@@ -10922,7 +10924,7 @@ const app = {
 				  }
 				});
 				this.el.sceneEl.addEventListener("missions-reversed", function (e) {
-				  self.reverse(self, it);
+				  self.reverse(self);
 				});
 			  },
 
@@ -10951,12 +10953,12 @@ const app = {
 				  let audioEl = '';
 				  let headline = '<h3>' + name + '</h3>'
 				  if (src_image != "") {
-					image = `<div class="annotation-image><div class = "annotation-image-box>
-					<img width="100px" height="100px" src="${src_image}" alt="${alt_image}></div>
+					image = `<div class="annotation-image"><div class="annotation-image-box">
+					<img width="100px" height="100px" src="${src_image}" alt="${alt_image}"></div>
 					<p class="annotation-image-caption">${caption_image}<span class="copyright">Foto: ${cr_image}</span></p></div>`
 				  }
 				  if (src_audio != "") {
-					audioEl = `<audio controls autoplay><source src="${src_audio}" type"audio/mpeg"></audio>`
+					audioEl = `<audio controls autoplay><source src="${src_audio}" type="audio/mpeg"></audio>`
 				  }
 				  let description = `<p>${desc}</p></div>`
 				  return content + headline + image + audioEl + description;
@@ -11032,13 +11034,13 @@ const app = {
 					self.showPopUp(
 					  self.data.name,
 					  self.data.answers,
-					  self.data.answer,
+					  self.data.rightAnswer,
 					  self.data.description
 					);
 				  }
 				});
 				this.el.sceneEl.addEventListener("missions-reversed", function (e) {
-				  self.reverse(self, it);
+				  self.reverse(self);
 				});
 			  },
 
@@ -11081,7 +11083,7 @@ const app = {
 				  inventory: false,
 				  rotate: false,
 				});
-				app.gui.message.messageCloseEl.addEventListener('click', function (e) {
+				app.gui.message.closeEl.addEventListener('click', function (e) {
 				  self.el.sceneEl.setAttribute("controller", {
 					raycaster: true,
 					inventory: true,
@@ -11220,7 +11222,7 @@ const app = {
 				  }
 				});
 				this.el.sceneEl.addEventListener("missions-reversed", function (e) {
-				  self.reverse(self, it);
+				  self.reverse(self);
 				});
 			  },
 			  showPopUp: function (desc) {
